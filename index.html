@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Love Story ❤️</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: url('https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/images/background.jpg') center/cover fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .book {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            height: 80vh;
+            transform-style: preserve-3d;
+        }
+
+        .page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 1.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            overflow: hidden;
+            z-index: 1; /* Tambahkan ini */
+        }
+
+        /* Ubah padding di page-content */
+        .page-content {
+             position: absolute;
+            width: 100%;
+            height: 100%;
+            padding: 20px; /* Kurangi dari 40px ke 20px */
+            backface-visibility: hidden;
+            background: linear-gradient(135deg, #fff8f8 0%, #ffe6ea 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; /* Ubah dari center ke flex-start */
+            padding-top: 40px; /* Tambah padding khusus untuk atas */
+    }
+
+        .page-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #ffe6ea 0%, #ffd1dc 100%);
+        }
+
+        .page.flipped {
+            transform: rotateY(-180deg);
+            z-index: 0; /* Tambahkan ini */
+        }
+
+        /* Tambahkan ini */
+        .page:nth-child(n+2) {
+        z-index: calc(10 - var(--i, 0));
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 1.2rem;
+            color: #ff6b88;
+            font-style: italic;
+        }
+
+        .photo-frame {
+            margin: 10px auto;
+            background: #fff;
+            padding: 10px;
+            width: 400px;  /* Sesuai ukuran foto referensi */
+            height: 300px; /* Sesuai ukuran foto referensi */
+            border: 15px solid white;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            transform: rotate(-3deg);
+            margin-bottom: 15px;
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-tape {
+            position: absolute;
+            width: 100px;
+            height: 30px;
+            background: rgba(255,255,255,0.6);
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            box-shadow: 0 0 3px rgba(0,0,0,0.1);
+        }
+
+        .caption {
+            font-size: 1.2rem;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .lyrics {
+            width: 80%;
+            margin: 15px auto;
+            padding: 15px;
+            font-size: 1.3rem;
+            line-height: 2;
+            color: #666;
+            text-align: center;
+            background: rgba(255,255,255,0.8);
+            border: 1px solid #ddd;
+            min-height: 100px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            position: relative;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .play-btn {
+            background: #ff6b88;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .navigation-buttons {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #ff6b88;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.05);
+            background: #ff6b88;
+            color: white;
+        }
+
+        .cover {
+            text-align: center;
+            padding: 20px;
+            margin-top: -20px; /* Tambahkan ini */
+        }
+
+        .cover h1 {
+            font-size: 3rem;
+            color: #ff6b88;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .decoration {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 2rem;
+            color: #ff6b88;
+            opacity: 0.3;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .book {
+                width: 95%;
+            }
+
+            .photo-frame {
+                width: 90%;
+            }
+
+            .lyrics {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading" id="loading">
+        <h2>Loading Our Love Story...</h2>
+    </div>
+
+    <!-- Music Player -->
+    <div class="music-player">
+        <button class="play-btn" onclick="togglePlay()">
+            <i class="fas fa-play" id="playIcon"></i>
+        </button>
+        <span id="songTitle">Our Song</span>
+        <audio id="bgMusic" loop>
+            <source src="Elvis Presley - Can-t Help Falling in Love (Lyrics).mp3" type="audio/mp3">
+        </audio>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="navigation-buttons">
+        <button class="nav-btn" onclick="prevPage()">Previous</button>
+        <button class="nav-btn" onclick="nextPage()">Next</button>
+    </div>
+
+    <!-- Book -->
+<div class="book" id="book">
+    <!-- Cover -->
+    <div class="page" id="page0">
+        <div class="page-content">
+            <div class="cover">
+                <h1>Our Love Story</h1>
+                <p>A journey of forever ❤️</p>
+                <div class="photo-frame">
+                    <div class="photo-tape"></div>
+                    <img src="img/g1.jpg" alt="Cover Photo">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page 1-2 -->
+    <div class="page" id="page1">
+        <div class="page-content">
+            <div class="photo-frame">
+                <div class="photo-tape"></div>
+                <img src="img/g2.jpg" alt="First Meet">
+            </div>
+            <div class="caption">Nadila</div>
+            <div class="lyrics">
+                Take my hand 
+                Take my whole life, too
+            </div>
+            <div class="page-number">1</div>
+        </div>
+        <div class="page-content page-back">
+            <div class="photo-frame">
+                <div class="photo-tape"></div>
+                <img src="img/g3.jpg" alt="Second Photo">
+            </div>
+            <div class="caption">Our memories</div>
+            <div class="lyrics">
+                For I can't help falling in love with you
+            </div>
+            <div class="page-number">2</div>
+        </div>
+    </div>
+
+    <!-- Page 3-4 -->
+    <div class="page" id="page2">
+        <div class="page-content">
+            <div class="photo-frame">
+                <div class="photo-tape"></div>
+                <img src="img/g1.jpg" alt="Third Photo">
+            </div>
+            <div class="caption">Kusuma</div>
+            <div class="lyrics">
+                For I can't help falling in love with you
+            </div>
+            <div class="page-number">2</div>
+        </div>
+        <div class="page-content page-back">
+            <div class="photo-frame">
+                <div class="photo-tape"></div>
+                <img src="img/g5.jpg" alt="Fourth Photo">
+            </div>
+            <div class="caption">Special moments</div>
+            <div class="lyrics">
+                Darling, so it goes
+                Some things are meant to be
+            </div>
+            <div class="page-number">3</div>
+        </div>
+    </div>
+
+    <!-- Page 5-6 -->
+    <div class="page" id="page3">
+        <div class="page-content">
+            <div class="photo-frame">
+                <div class="photo-tape"></div>
+                <img src="img/g6.jpg" alt="Fifth Photo">
+            </div>
+            <div class="caption">Dewi</div>
+            <div class="lyrics">
+                Like a river flows
+                Surely to the sea
+            </div>
+            <div class="page-number">3</div>
+        </div>
+        <div class="page-content page-back">
+            <div class="photo-frame">
+                <div class="photo-tape"></div>
+                <img src="img/g7.jpg" alt="Sixth Photo">
+            </div>
+            <div class="caption">Beautiful days</div>
+            <div class="lyrics">
+                For I can't help falling in love with you
+                For I can't help falling in love with you
+            </div>
+            <div class="page-number">4</div>
+        </div>
+    </div>
+
+    <!-- Page 7-8 -->
+<div class="page" id="page4">
+    <div class="page-content">
+        <div class="photo-frame">
+            <div class="photo-tape"></div>
+            <img src="img/g3.jpg" alt="Seventh Photo">
+        </div>
+        <div class="caption">LOPYUU SAYANGKUU</div>
+        <div class="lyrics">Darling, so it goes
+            Some things are meant to be</div>
+        <div class="page-number">4</div>
+    </div>
+    <div class="page-content page-back">
+        <div class="photo-frame">
+            <div class="photo-tape"></div>
+            <img src="img/g9.jpg" alt="Eighth Photo">
+        </div>
+        <div class="caption">Endless love</div>
+        <div class="lyrics">For I can't help falling in love with you
+            For I can't help falling in love with you</div>
+        <div class="page-number">5</div>
+    </div>
+</div>
+
+<!-- Page 9-10 -->
+<div class="page" id="page5">
+    <div class="page-content">
+        <div class="photo-frame">
+            <div class="photo-tape"></div>
+            <img src="img/g4.jpg" alt="Seventh Photo">
+        </div>
+        <div class="caption">Sweet moments</div>
+        <div class="lyrics">Take my hand
+            Take my whole life, too</div>
+        <div class="page-number">5</div>
+    </div>
+    <div class="page-content page-back">
+        <div class="photo-frame">
+            <div class="photo-tape"></div>
+            <img src="img/g11.jpg" alt="Eighth Photo">
+        </div>
+        <div class="caption">Endless love</div>
+        <div class="lyrics">Take my hand
+            Take my whole life, too</div>
+        <div class="page-number">6</div>
+    </div>
+</div>
+
+<!-- Page 11-12 -->
+<div class="page" id="page6">
+    <div class="page-content">
+        <div class="photo-frame">
+            <div class="photo-tape"></div>
+            <img src="img/g7.jpg" alt="Ninth Photo">
+        </div>
+        <div class="caption">Sweet memories</div>
+        <div class="lyrics">For I can't help falling in love with you</div>
+        <div class="page-number">6</div>
+    </div>
+    <div class="page-content page-back">
+        <div class="photo-frame">
+            <div class="photo-tape"></div>
+            <img src="img/g3.jpg" alt="Tenth Photo">
+        </div>
+        <div class="caption">Enduring love</div>
+        <div class="lyrics">For I can't help falling in love with you</div>
+        <div class="page-number">7</div>
+    </div>
+</div>
+
+<!-- Page 12-13 -->
+<div class="page" id="page7">
+    <div class="page-content">
+        <div class="photo-frame">
+            <div class="photo-tape"></div>
+            <img src="img/g11.jpg" alt="First Meet">
+        </div>
+        <div class="caption">TERUS BERSAMAKUUUUU YAAA SAYANGGG</div>
+        <div class="lyrics">
+            For I can't help falling in love with you
+        </div>
+        <div class="page-number">7</div>
+    </div>
+    <div class="page-content page-back">
+        <div class="photo-frame">
+            <div class="photo-tape"></div>
+            <img src="img/g3.jpg" alt="Second Photo">
+        </div>
+        <div class="caption">Our memories</div>
+        <div class="lyrics">
+            For I can't help falling in love with yo
+        </div>
+        <div class="page-number">8</div>
+    </div>
+</div>
+        <!-- Add more pages as needed -->
+    <script>
+    // Definisi variabel global di awal (HANYA SEKALI)
+    let currentPage = 0;
+    let autoFlipTimer;
+    const totalPages = document.querySelectorAll('.page').length;
+
+        // Loading screen
+        window.addEventListener('load', () => {
+        setTimeout(() => {
+        document.getElementById('loading').classList.add('hide');
+        }, 1500);
+    });
+
+        function flipPage(pageNum) {
+        const pages = document.querySelectorAll('.page');
+        pages.forEach((page, index) => {
+        page.style.zIndex = totalPages - index;
+        if (index < pageNum) {
+            page.classList.add('flipped');
+        } else {
+            page.classList.remove('flipped');
+        }
+        });
+    }
+
+        function nextPage() {
+        if (currentPage < totalPages - 1) {
+        currentPage++;
+        flipPage(currentPage);
+         }
+    }
+
+    function prevPage() {
+    if (currentPage > 0) {
+        currentPage--;
+        flipPage(currentPage);
+    }
+}
+
+        function togglePlay() {
+            const music = document.getElementById('bgMusic');
+            const icon = document.getElementById('playIcon');
+            
+            if (music.paused) {
+                music.play();
+                icon.className = 'fas fa-pause';
+            } else {
+                music.pause();
+                icon.className = 'fas fa-play';
+            }
+        }
+
+        // Durasi untuk tiap halaman dalam milidetik
+        const pageDurations = {
+        0: 0, // Halaman 1: 13 detik
+        1: 15000, // Halaman 2: 13 detik
+        2: 14000,  // Halaman 3: 9 detik
+        3: 8000,  // Halaman 4: 9 detik
+        4: 11000, // Halaman 5: 13 detik
+        5: 14000, // Halaman 6: 13 detik
+        6: 14000, // Halaman 7: 13 detik
+        7: 17000  // Halaman 8: 13 detik
+    };
+
+    function startAutoFlip() {
+    function flip() {
+        if (currentPage < totalPages - 1) {
+            nextPage();
+            const duration = pageDurations[currentPage] || 0;
+            autoFlipTimer = setTimeout(flip, duration);
+        } else {
+            currentPage = 0;
+            flipPage(currentPage);
+            autoFlipTimer = setTimeout(flip, pageDurations[0]);
+        }
+    }
+
+    // Mulai dengan halaman pertama
+    const firstDuration = pageDurations[currentPage] || 0;
+    autoFlipTimer = setTimeout(flip, firstDuration);
+}
+
+function stopAutoFlip() {
+    clearTimeout(autoFlipTimer);
+}
+
+// Modifikasi fungsi togglePlay
+function togglePlay() {
+    const music = document.getElementById('bgMusic');
+    const icon = document.getElementById('playIcon');
+    
+    if (music.paused) {
+        music.play();
+        icon.className = 'fas fa-pause';
+        startAutoFlip();
+    } else {
+        music.pause();
+        icon.className = 'fas fa-play';
+        stopAutoFlip();
+    }
+}
+
+        // Add floating hearts
+        function addHearts() {
+            const book = document.getElementById('book');
+            for (let i = 0; i < 10; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart decoration';
+                heart.innerHTML = '❤️';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.top = Math.random() * 100 + 'vh';
+                heart.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(heart);
+            }
+        }
+
+        addHearts();
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') nextPage();
+        if (e.key === 'ArrowLeft') prevPage();
+    });
+
+        // Debug
+    document.addEventListener('DOMContentLoaded', () => {
+    const pages = document.querySelectorAll('.page');
+    const totalPages = pages.length; // Hitung ulang total halaman setelah konten DOM siap
+    console.log('Total pages detected:', totalPages); // Untuk cek jumlah halaman yang terdeteksi
+
+    pages.forEach((page, index) => {
+        page.style.zIndex = totalPages - index; // Set z-index agar tidak bertumpuk
+        page.addEventListener('click', () => {
+            console.log('Clicked page:', index); // Debug untuk memastikan klik halaman terdeteksi
+            // Aksi tambahan saat halaman diklik
+            if (index === currentPage) {
+                nextPage();  // Flip ke halaman berikutnya saat halaman saat ini diklik
+            }
+        });
+    });
+});
+
+    </script>
+</body>
+</html>
